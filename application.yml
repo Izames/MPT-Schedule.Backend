@@ -1,0 +1,15 @@
+spring:
+  config:
+    name: MPT-Schedule
+server:
+  port: 8042
+management:
+  server:
+    port: 8816
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    prometheus:
+      enabled: true
