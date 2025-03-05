@@ -9,6 +9,7 @@ import (
 
 func GetGroups() {
 	var unSCDays []string
+	var week []Models.Day
 	sheet := Models.Group.GetSheetList()[0]
 	cols, _ := Models.Group.GetCols(sheet)
 	for i, col := range cols[10] {
@@ -39,14 +40,12 @@ func GetGroups() {
 		if stop {
 			continue
 		}
+		for j := 0; j < 6; j++ {
+			week = append(week, Models.Day{DayNum: j + 1, Build: row[2+j], UnSCDay: utils.Contains(strings.ToLower(row[2+j]), unSCDays)})
+		}
 		group := Models.GroupModel{
-			Name:      row[1],
-			Monday:    Models.Day{Build: row[2], UnSCDay: utils.Contains(strings.ToLower(row[2]), unSCDays)},
-			Tuesday:   Models.Day{Build: row[3], UnSCDay: utils.Contains(strings.ToLower(row[3]), unSCDays)},
-			Wednesday: Models.Day{Build: row[4], UnSCDay: utils.Contains(strings.ToLower(row[4]), unSCDays)},
-			Thursday:  Models.Day{Build: row[5], UnSCDay: utils.Contains(strings.ToLower(row[5]), unSCDays)},
-			Friday:    Models.Day{Build: row[6], UnSCDay: utils.Contains(strings.ToLower(row[6]), unSCDays)},
-			Saturday:  Models.Day{Build: row[7], UnSCDay: utils.Contains(strings.ToLower(row[7]), unSCDays)},
+			Name: row[1],
+			Week: week,
 		}
 		Models.Groups = append(Models.Groups, group)
 

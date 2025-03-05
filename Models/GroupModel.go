@@ -2,16 +2,13 @@ package Models
 
 type GroupModel struct {
 	Name      string
-	Monday    Day
-	Tuesday   Day
-	Wednesday Day
-	Thursday  Day
-	Friday    Day
-	Saturday  Day
-	Lessons   []LessonModel
+	Week      []Day
+	LessonsS1 []LessonModel
+	LessonsS2 []LessonModel
 }
 
 type Day struct {
+	DayNum  int
 	Build   string
 	UnSCDay bool
 }

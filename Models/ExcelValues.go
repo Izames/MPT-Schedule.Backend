@@ -5,7 +5,8 @@ import (
 	"os"
 )
 
-var Teachers []TeacherModel
+var TeachersS1 []TeacherModel
+var TeachersS2 []TeacherModel
 
 var Groups []GroupModel
 
@@ -52,7 +53,8 @@ func Clean() {
 		os.Remove(file.Path)
 	}
 	Extracts = nil
-	Teachers = []TeacherModel{}
+	TeachersS1 = []TeacherModel{}
+	TeachersS2 = []TeacherModel{}
 	Groups = []GroupModel{}
 	Schedules = []ScheduleModel{}
 	Builds = []string{}

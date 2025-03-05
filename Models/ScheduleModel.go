@@ -6,25 +6,19 @@ type ScheduleModel struct {
 	Semester2 Semester
 }
 type Semester struct {
-	Monday    ScheduleDay
-	Tuesday   ScheduleDay
-	Wednesday ScheduleDay
-	Thursday  ScheduleDay
-	Friday    ScheduleDay
-	Saturday  ScheduleDay
+	Week []ScheduleDay
 }
 type ScheduleDay struct {
-	Day          int
-	StudyingDay  bool
-	Building     string
-	FirstLesson  ScheduleLesson
-	SecondLesson ScheduleLesson
-	ThirdLesson  ScheduleLesson
-	FourthLesson ScheduleLesson
-	FifthLesson  ScheduleLesson
+	Day         int
+	StudyingDay bool
+	Building    string
+	Lessons     []ScheduleLesson
 }
 type ScheduleLesson struct {
-	NumLessonName string
-	DenLessonName string
-	Teacher       string
+	NumLessonName NumDenLesson
+	DenLessonName NumDenLesson
+}
+type NumDenLesson struct {
+	LessonName string
+	Teacher    string
 }

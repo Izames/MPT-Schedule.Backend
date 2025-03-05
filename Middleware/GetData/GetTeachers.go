@@ -10,6 +10,7 @@ import (
 
 func GetTeachers() {
 	sheets := Models.Teacher.GetSheetList()
+	var week []Models.LessonDayModel
 	line, _ := Models.Teacher.GetRows(sheets[0])
 	var buildingsName []string
 	for i := 1; i < len(line[0]); i++ {
@@ -46,7 +47,7 @@ func GetTeachers() {
 				Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неправильно заполнено ограничение пар преподавателя %s в листе %s. Количество должно быть от 1 до 5", row[0], sheet))
 				continue
 			}
-			lessons, _ := strconv.Atoi(row[12])
+			lessons, _ := strconv.Atoi(row[13])
 			var buildsForTeacher []string
 			for j := 0; j < buildRows; j++ {
 				if row[14+j] == "+" {
@@ -54,31 +55,32 @@ func GetTeachers() {
 				}
 			}
 			lessonsForDay := Models.LessonDayModel{
-				FirstLesson:  row[1] == "+",
-				SecondLesson: row[2] == "+",
-				ThirdLesson:  row[3] == "+",
-				FourthLesson: row[4] == "+",
-				FifthLesson:  row[5] == "+",
+				Lessons: []bool{row[1] == "+", row[2] == "+", row[3] == "+", row[4] == "+", row[5] == "+"},
 			}
 			freeDay := Models.LessonDayModel{
-				FirstLesson:  false,
-				SecondLesson: false,
-				ThirdLesson:  false,
-				FourthLesson: false,
-				FifthLesson:  false,
+				Lessons: []bool{false, false, false, false, false},
 			}
-			Models.Teachers = append(Models.Teachers, Models.TeacherModel{
+			for j := 0; j < 6; j++ {
+				week = append(week, utils.CheckPrepodDay(freeDay, lessonsForDay, row[6] == "+"))
+			}
+			for j, _ := range week {
+				week[j].Day = j + 1
+			}
+			Models.TeachersS1 = append(Models.TeachersS1, Models.TeacherModel{
 				FIO:          row[0],
-				Monday:       utils.CheckPrepodDay(freeDay, lessonsForDay, row[6] == "+"),
-				Tuesday:      utils.CheckPrepodDay(freeDay, lessonsForDay, row[7] == "+"),
-				Wednesday:    utils.CheckPrepodDay(freeDay, lessonsForDay, row[8] == "+"),
-				Thursday:     utils.CheckPrepodDay(freeDay, lessonsForDay, row[9] == "+"),
-				Friday:       utils.CheckPrepodDay(freeDay, lessonsForDay, row[10] == "+"),
-				Saturday:     utils.CheckPrepodDay(freeDay, lessonsForDay, row[11] == "+"),
+				Week:         week,
 				Window:       row[12] == "+",
 				LessonsInDay: lessons,
 				Builds:       buildsForTeacher,
 			})
+			Models.TeachersS2 = append(Models.TeachersS2, Models.TeacherModel{
+				FIO:          row[0],
+				Week:         week,
+				Window:       row[12] == "+",
+				LessonsInDay: lessons,
+				Builds:       buildsForTeacher,
+			})
+			week = []Models.LessonDayModel{}
 		}
 	}
 }

@@ -5,16 +5,26 @@ import (
 	"strings"
 )
 
-func FindTeacherByName(name string) *Models.TeacherModel {
+func FindTeacherByName(name string, semester int) *Models.TeacherModel {
 	name = strings.ReplaceAll(name, " ", "")
 	parts := strings.Split(name, ".")
 	reversedName := parts[len(parts)-1] + " " + strings.Join(parts[:len(parts)-1], ".") + "."
+	if semester == 1 {
+		for _, Teacher := range Models.TeachersS1 {
 
-	for _, Teacher := range Models.Teachers {
-
-		if Teacher.FIO == reversedName {
-			return &Teacher
+			if Teacher.FIO == reversedName {
+				return &Teacher
+			}
 		}
 	}
+	if semester == 2 {
+		for _, Teacher := range Models.TeachersS2 {
+
+			if Teacher.FIO == reversedName {
+				return &Teacher
+			}
+		}
+	}
+
 	return nil
 }

@@ -38,12 +38,13 @@ func GenerateRequest(context *gin.Context) {
 	//собрать ограничения учителей
 	GetData.GetTeachers()
 	GetData.GetGroups()
-	for _, group := range Models.Groups {
-		InsertData.GenerateSchedule(group)
-	}
 	for _, file := range Models.Extracts {
 		GetData.GetLessons(file)
 	}
+	for _, group := range Models.Groups {
+		InsertData.GenerateSchedule(group)
+	}
+
 	println("")
 	//дублируем будущее расписание
 	//WorkWithFiles.DuplicateFile()

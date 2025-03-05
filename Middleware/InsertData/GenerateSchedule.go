@@ -6,9 +6,7 @@ import (
 )
 
 func GenerateSchedule(group Models.GroupModel) {
-	var daysForInsert []*Models.ScheduleDay
-	var lessonsSemester1 []Models.LessonModel
-	var lessonsSemester2 []Models.LessonModel
+	var daysForInsert []Models.ScheduleDay
 	days := []Models.ScheduleDay{
 		{Day: 1}, // Понедельник
 		{Day: 2}, // Вторник
@@ -22,35 +20,35 @@ func GenerateSchedule(group Models.GroupModel) {
 		var result bool
 		days[i], result = utils.FilterUnSKDays(group, days[i])
 		if result {
-			daysForInsert = append(daysForInsert, &days[i])
-		}
-	}
-	for _, lesson := range group.Lessons {
-		if lesson.PerWeekS1 > 0 {
-			lessonsSemester1 = append(lessonsSemester1, lesson)
-		}
-		if lesson.PerWeekS2 > 0 {
-			lessonsSemester2 = append(lessonsSemester2, lesson)
+			daysForInsert = append(daysForInsert, days[i])
 		}
 	}
 
-	InsertInSemester(lessonsSemester1, daysForInsert, 1)
+	daysForInsert = InsertInSemester(group.LessonsS1, daysForInsert)
 	schedule := Models.ScheduleModel{
 		Group: group.Name,
 	}
-	schedule.Semester1.Monday = days[0]
-	schedule.Semester1.Tuesday = days[1]
-	schedule.Semester1.Wednesday = days[2]
-	schedule.Semester1.Thursday = days[3]
-	schedule.Semester1.Friday = days[4]
-	schedule.Semester1.Saturday = days[5]
-	//InsertInSemester(lessonsSemester2, daysForInsert)
-	schedule.Semester2.Monday = days[0]
-	schedule.Semester2.Tuesday = days[1]
-	schedule.Semester2.Wednesday = days[2]
-	schedule.Semester2.Thursday = days[3]
-	schedule.Semester2.Friday = days[4]
-	schedule.Semester2.Saturday = days[5]
+	for i, day := range days {
+		for _, dayI := range daysForInsert {
+			if dayI.Day == day.Day {
+				days[i] = dayI
+			}
+		}
+	}
+	for _, day := range days {
+		schedule.Semester1.Week = append(schedule.Semester1.Week, day)
+	}
+	daysForInsert = InsertInSemester(group.LessonsS2, daysForInsert)
+	for i, day := range days {
+		for _, dayI := range daysForInsert {
+			if dayI.Day == day.Day {
+				days[i] = dayI
+			}
+		}
+	}
+	for _, day := range days {
+		schedule.Semester1.Week = append(schedule.Semester1.Week, day)
+	}
 
 	Models.Schedules = append(Models.Schedules, schedule)
 }

@@ -80,16 +80,20 @@ func GetLessons(file *excelize.File) {
 					continue
 				}
 				for i := prepodsStart; i < len(groupsId)+prepodsStart; i++ {
-					teacher1 := &Models.TeacherModel{}
-					teacher2 := &Models.TeacherModel{}
+					teacher1S1 := &Models.TeacherModel{}
+					teacher2S1 := &Models.TeacherModel{}
+					teacher1S2 := &Models.TeacherModel{}
+					teacher2S2 := &Models.TeacherModel{}
 					var doubleTeacher bool
 					//проверка на английский
 					if re.MatchString(row[i]) {
 						doubleTeacher = true
 						match1, match2, _ := strings.Cut(row[i], "\n")
-						teacher1 = utils.FindTeacherByName(match1)
-						teacher2 = utils.FindTeacherByName(match2)
-						if teacher1 == nil || teacher2 == nil {
+						teacher1S1 = utils.FindTeacherByName(match1, 1)
+						teacher2S1 = utils.FindTeacherByName(match2, 1)
+						teacher1S2 = utils.FindTeacherByName(match1, 2)
+						teacher2S2 = utils.FindTeacherByName(match2, 2)
+						if teacher1S1 == nil || teacher2S2 == nil {
 							stop = true
 							Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Один из преподавателей английского не найден в системе %s на листе %s", row[i], sheet))
 							break
@@ -98,8 +102,9 @@ func GetLessons(file *excelize.File) {
 					} else {
 						doubleTeacher = false
 						match1 := row[i]
-						teacher1 = utils.FindTeacherByName(match1)
-						if teacher1 == nil {
+						teacher1S1 = utils.FindTeacherByName(match1, 1)
+						teacher1S2 = utils.FindTeacherByName(match1, 2)
+						if teacher1S1 == nil {
 							stop = true
 							Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неопознанный преподаватель %s на листе %s", row[i], sheet))
 							break
@@ -108,16 +113,27 @@ func GetLessons(file *excelize.File) {
 
 					Value1S, _ := strconv.Atoi(row[PerWeekValue1S])
 					Value2S, _ := strconv.Atoi(row[PerWeekValue2S])
-					lesson := Models.LessonModel{
-						Name:          row[1],
-						PerWeekS1:     float32(Value1S / 2),
-						PerWeekS2:     float32(Value2S / 2),
-						Teacher:       *teacher1,
-						TeacherTwo:    *teacher2,
-						DoubleTeacher: doubleTeacher,
+					if Value1S > 0 {
+						lessonS1 := Models.LessonModel{
+							Name:          row[1],
+							PerWeek:       float32(Value1S / 2),
+							Teacher:       *teacher1S1,
+							TeacherTwo:    *teacher2S1,
+							DoubleTeacher: doubleTeacher,
+						}
+						Models.Groups[groupsId[i-prepodsStart]].LessonsS1 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS1, lessonS1)
 					}
-					Models.Groups[groupsId[i-prepodsStart]].Lessons = append(Models.Groups[groupsId[i-prepodsStart]].Lessons, lesson)
 
+					if Value2S > 0 {
+						lessonS2 := Models.LessonModel{
+							Name:          row[1],
+							PerWeek:       float32(Value2S / 2),
+							Teacher:       *teacher1S2,
+							TeacherTwo:    *teacher2S2,
+							DoubleTeacher: doubleTeacher,
+						}
+						Models.Groups[groupsId[i-prepodsStart]].LessonsS2 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS2, lessonS2)
+					}
 				}
 			}
 
