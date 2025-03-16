@@ -15,6 +15,7 @@ func Deserialization(form *multipart.Form) error {
 	Models.DeputyDirectorUR = form.Value["deputy_director_ur"][0]
 	Models.DeputyDirectorUMR = form.Value["deputy_director_umr"][0]
 	Models.MethodologicalDepartment = form.Value["methodological_department"][0]
+	Models.CurrentYear = form.Value["current_year"][0]
 
 	files := form.File["extracts"]
 	for _, fileHeader := range files {

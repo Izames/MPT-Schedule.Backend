@@ -3,57 +3,110 @@ package InsertData
 import (
 	"MPT-Schedule/Middleware/utils"
 	"MPT-Schedule/Models"
+	"fmt"
 )
 
-func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay) []Models.ScheduleDay {
+func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay, group string, semester int) []Models.ScheduleDay {
 	lessons = utils.SortLessons(lessons)
-	for j, _ := range daysForInsert {
-		for _, lesson := range lessons {
-
-			//проверка на препода
-			if len(daysForInsert[j].Lessons) == 5 {
-				continue
-			}
-			if lesson.DoubleTeacher {
-				if !utils.Contains(daysForInsert[j].Building, lesson.Teacher.Builds) && !utils.Contains(daysForInsert[j].Building, lesson.TeacherTwo.Builds) {
+	NorDLessons := utils.FindNorDLessons(lessons)
+	attemps := 0
+	for !(len(lessons) == 0 || attemps > 3) {
+		lessonsCount := len(lessons)
+		for j := range daysForInsert {
+			for c := 0; c < len(lessons); c++ {
+				// Проверка на максимальное количество пар в день
+				if len(daysForInsert[j].Lessons) == 5 {
 					continue
 				}
-				if utils.TeacherLessonsReserved(lesson.Teacher.Week[daysForInsert[j].Day-1]) == lesson.Teacher.LessonsInDay || utils.TeacherLessonsReserved(lesson.TeacherTwo.Week[daysForInsert[j].Day-1]) == lesson.TeacherTwo.LessonsInDay {
+
+				//проверка на какую пару внедрить
+				switch {
+				case daysForInsert[j].Lessons == nil:
+					goBackOnStep := false
+					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 0) {
+						for k, l := range lessons {
+							if l.PerWeek == 0 {
+								lessons = append(lessons[:k], lessons[k+1:]...)
+								goBackOnStep = true
+							}
+						}
+						if goBackOnStep {
+							c--
+						}
+						continue
+					}
+
+				case len(daysForInsert[j].Lessons) == 1:
+					goBackOnStep := false
+					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 1) {
+						for k, l := range lessons {
+							if l.PerWeek == 0 {
+								lessons = append(lessons[:k], lessons[k+1:]...)
+								goBackOnStep = true
+							}
+						}
+						if goBackOnStep {
+							c--
+						}
+						continue
+					}
+				case len(daysForInsert[j].Lessons) == 2:
+					goBackOnStep := false
+					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 2) {
+						for k, l := range lessons {
+							if l.PerWeek == 0 {
+								lessons = append(lessons[:k], lessons[k+1:]...)
+								goBackOnStep = true
+							}
+						}
+						if goBackOnStep {
+							c--
+						}
+						continue
+					}
+				case len(daysForInsert[j].Lessons) == 3:
+					goBackOnStep := false
+					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 3) {
+						for k, l := range lessons {
+							if l.PerWeek == 0 {
+								lessons = append(lessons[:k], lessons[k+1:]...)
+								goBackOnStep = true
+							}
+						}
+						if goBackOnStep {
+							c--
+						}
+						continue
+					}
+				case len(daysForInsert[j].Lessons) == 4:
+					goBackOnStep := false
+					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 4) {
+						for k, l := range lessons {
+							if l.PerWeek == 0 {
+								lessons = append(lessons[:k], lessons[k+1:]...)
+								goBackOnStep = true
+							}
+						}
+						if goBackOnStep {
+							c--
+						}
+						continue
+					}
+				case len(daysForInsert[j].Lessons) == 5:
 					continue
 				}
-			} else {
-				if !utils.Contains(daysForInsert[j].Building, lesson.Teacher.Builds) {
-					continue
-				}
-				if utils.TeacherLessonsReserved(lesson.Teacher.Week[daysForInsert[j].Day-1]) == lesson.Teacher.LessonsInDay {
-					continue
-				}
-			}
 
-			//проверка на какую пару внедрить
-			if daysForInsert[j].Lessons == nil {
-				if lesson.Teacher.Week[daysForInsert[j].Day-1].Lessons[0] {
-					//проверить на окно
-					//проверить пару на числитель/знаменатель
-					//в случае, если пара полная, то просто вставить и вычесть 1
-					//в случае, если пара числитель/знаменатель, найти ей такую же пару и отнять 0.5
-					//если пара = 0, то убрать ее из пар
+			}
+		}
+		if len(lessons) == lessonsCount {
+			attemps++
+			if attemps == 3 {
+				for l := range lessons {
+					Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("ошибка при генерации расписания, у %s не были вставлены пары: %s в %d семестре. Пар осталось: %f", group, lessons[l].Name, semester, lessons[l].PerWeek))
 				}
 			}
-			if len(daysForInsert[j].Lessons) == 1 {
-
-			}
-			if len(daysForInsert[j].Lessons) == 2 {
-
-			}
-			if len(daysForInsert[j].Lessons) == 3 {
-
-			}
-			if len(daysForInsert[j].Lessons) == 4 {
-
-			}
-
 		}
 	}
+
 	return daysForInsert
 }

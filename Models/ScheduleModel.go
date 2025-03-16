@@ -1,6 +1,8 @@
 package Models
 
 type ScheduleModel struct {
+	File      string
+	List      string
 	Group     string
 	Semester1 Semester
 	Semester2 Semester

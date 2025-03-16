@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func GetLessons(file *excelize.File) {
+func GetLessons(file *excelize.File, fileName string) {
 	//листы для считывания информации
 	sheets := file.GetSheetList()
 	re := regexp.MustCompile(`^ПП`)
@@ -122,6 +122,8 @@ func GetLessons(file *excelize.File) {
 							DoubleTeacher: doubleTeacher,
 						}
 						Models.Groups[groupsId[i-prepodsStart]].LessonsS1 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS1, lessonS1)
+						Models.Groups[groupsId[i-prepodsStart]].ListName = sheet
+						Models.Groups[groupsId[i-prepodsStart]].FileName = fileName
 					}
 
 					if Value2S > 0 {
@@ -133,6 +135,9 @@ func GetLessons(file *excelize.File) {
 							DoubleTeacher: doubleTeacher,
 						}
 						Models.Groups[groupsId[i-prepodsStart]].LessonsS2 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS2, lessonS2)
+						Models.Groups[groupsId[i-prepodsStart]].ListName = sheet
+						Models.Groups[groupsId[i-prepodsStart]].FileName = fileName
+
 					}
 				}
 			}

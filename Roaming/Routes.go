@@ -3,52 +3,57 @@ package Roaming
 import (
 	"MPT-Schedule/AuthMiddleware/Auth"
 	"MPT-Schedule/Middleware/Requests"
+	con "context"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"time"
 )
 
-var (
-	httpRequestsTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "http_requests_total",
-			Help: "Total number of all HTTP requests",
-		},
-		[]string{"Method", "endpoint"},
-	)
-	schedulesGenerated = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "schedules_generated_total",
-			Help: "Total number of all generated schedules",
-		},
-	)
-	userAuth = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "user_enter_total",
-			Help: "user authed",
-		},
-	)
-)
-
-func init() {
-	prometheus.MustRegister(httpRequestsTotal)
-	prometheus.MustRegister(schedulesGenerated)
-	prometheus.MustRegister(userAuth)
-}
+var auth_count int
+var generatedSchedules int
+var http_requests int
 
 func Routes() {
+
+	token := "ZtioJd3fB0gaZRNuF1RFkeHrhuvelVwYrroVBgTXdPG70XjQACcJUQZW-AFfs1LG9B4RRIK3MXxVnw1BFscLHg=="
+	url := "http://localhost:8086"
+	client := influxdb2.NewClient(url, token)
+	org := "MPT"
+	bucket := "metrics"
+	writeAPI := client.WriteAPIBlocking(org, bucket)
+
 	router := gin.Default()
-	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.Use(func(context *gin.Context) {
 		context.Next()
-
-		httpRequestsTotal.WithLabelValues(context.Request.Method, context.FullPath()).Inc()
-
-		if context.FullPath() == "/generateSchedule" && context.Writer.Status() == 200 {
-			schedulesGenerated.Inc()
+		if context.Request.URL.Path != "/metrics" {
+			http_requests++
+			tags := map[string]string{
+				"method":   context.Request.Method,
+				"endpoint": context.FullPath(),
+			}
+			fields := map[string]interface{}{
+				"count": http_requests,
+			}
+			point := write.NewPoint("http_requests", tags, fields, time.Now())
+			writeAPI.WritePoint(con.Background(), point)
 		}
+		if context.FullPath() == "/generateSchedule" && context.Writer.Status() == 200 {
+			generatedSchedules++
+			fields := map[string]interface{}{
+				"count": generatedSchedules,
+			}
+			point := write.NewPoint("schedules_generated", nil, fields, time.Now())
+			writeAPI.WritePoint(con.Background(), point)
+		}
+
 		if context.FullPath() == "/auth" {
-			userAuth.Inc()
+			auth_count++
+			fields := map[string]interface{}{
+				"count": auth_count,
+			}
+			point := write.NewPoint("user_auth", nil, fields, time.Now())
+			writeAPI.WritePoint(con.Background(), point)
 		}
 	})
 	router.POST("/auth", Auth.Authentification)

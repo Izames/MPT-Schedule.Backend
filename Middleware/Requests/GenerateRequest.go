@@ -3,6 +3,7 @@ package Requests
 import (
 	"MPT-Schedule/Middleware/GetData"
 	"MPT-Schedule/Middleware/InsertData"
+	"MPT-Schedule/Middleware/WorkWithFiles"
 	"MPT-Schedule/Models"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -38,22 +39,14 @@ func GenerateRequest(context *gin.Context) {
 	//собрать ограничения учителей
 	GetData.GetTeachers()
 	GetData.GetGroups()
-	for _, file := range Models.Extracts {
-		GetData.GetLessons(file)
+	for i, file := range Models.Extracts {
+		GetData.GetLessons(file, extractFiles[i].Filename)
 	}
 	for _, group := range Models.Groups {
 		InsertData.GenerateSchedule(group)
 	}
-
-	println("")
-	//дублируем будущее расписание
-	//WorkWithFiles.DuplicateFile()
-	//file := InsertData.CreateSchedule()
-	//path := WorkWithFiles.Zipping(file)
-	//file.Close()
-	//context.File(path)
-	//os.Remove(path)
-	//os.Remove("Schedule1.xlsx")
-	//os.Remove("Schedule2.xlsx")
-	defer Models.Clean()
+	files, paths := WorkWithFiles.GenerateScheduleFile()
+	zip := WorkWithFiles.ZippingFiles(files)
+	context.File(zip)
+	defer Models.Clean(paths)
 }

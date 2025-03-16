@@ -10,5 +10,6 @@ type TeacherModel struct {
 
 type LessonDayModel struct {
 	Day     int
+	Build   string
 	Lessons []bool
 }

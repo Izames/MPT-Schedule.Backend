@@ -21,6 +21,7 @@ var Columns = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L
 var Director string
 
 var Years string
+var CurrentYear string
 
 var ValidityTerm string
 
@@ -40,9 +41,10 @@ var Group *excelize.File
 
 var FilesErrors []string
 
-func Clean() {
+func Clean(files []string) {
 	Director = ""
 	Years = ""
+	CurrentYear = ""
 	ValidityTerm = ""
 	EndDate = ""
 	DeputyDirectorUR = ""
@@ -61,4 +63,7 @@ func Clean() {
 	Teacher = nil
 	Group = nil
 	FilesErrors = []string{}
+	for _, file := range files {
+		os.Remove(file)
+	}
 }
