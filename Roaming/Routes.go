@@ -2,11 +2,13 @@ package Roaming
 
 import (
 	"MPT-Schedule/AuthMiddleware/Auth"
+	"MPT-Schedule/AuthMiddleware/JWT"
 	"MPT-Schedule/Middleware/Requests"
 	con "context"
 	"github.com/gin-gonic/gin"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
+	"net/http"
 	"time"
 )
 
@@ -14,16 +16,30 @@ var auth_count int
 var generatedSchedules int
 var http_requests int
 
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	}
+}
 func Routes() {
 
-	token := "ZtioJd3fB0gaZRNuF1RFkeHrhuvelVwYrroVBgTXdPG70XjQACcJUQZW-AFfs1LG9B4RRIK3MXxVnw1BFscLHg=="
+	token := "mhXVbCCeKBsbxi5OCoOUBGGVdxazqkJ_9oBHk9b_rjymBspRFd9f61lQ48-_-OUSQBrMGk3MwSRMgTCxTCby0A=="
 	url := "http://localhost:8086"
 	client := influxdb2.NewClient(url, token)
 	org := "MPT"
 	bucket := "metrics"
 	writeAPI := client.WriteAPIBlocking(org, bucket)
-
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 	router.Use(func(context *gin.Context) {
 		context.Next()
 		if context.Request.URL.Path != "/metrics" {
@@ -60,7 +76,10 @@ func Routes() {
 	router.POST("/register", Auth.Registration)
 	router.POST("/sendPin", Auth.SendPinCode)
 	router.POST("/updatePassword", Auth.UpdatePassword)
-	router.POST("/generateSchedule", Requests.GenerateRequest)
+	//приватные ссылки
+	privateRoutes := router.Group("/schedule")
+	privateRoutes.Use(JWT.JWTAuth())
+	privateRoutes.POST("/generateSchedule", Requests.GenerateRequest)
 
 	router.Run(":8091")
 }

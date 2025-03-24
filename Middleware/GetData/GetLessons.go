@@ -116,7 +116,7 @@ func GetLessons(file *excelize.File, fileName string) {
 					if Value1S > 0 {
 						lessonS1 := Models.LessonModel{
 							Name:          row[1],
-							PerWeek:       float32(Value1S / 2),
+							PerWeek:       float32(Value1S) / 2,
 							Teacher:       *teacher1S1,
 							TeacherTwo:    *teacher2S1,
 							DoubleTeacher: doubleTeacher,
@@ -129,7 +129,7 @@ func GetLessons(file *excelize.File, fileName string) {
 					if Value2S > 0 {
 						lessonS2 := Models.LessonModel{
 							Name:          row[1],
-							PerWeek:       float32(Value2S / 2),
+							PerWeek:       float32(Value2S) / 2,
 							Teacher:       *teacher1S2,
 							TeacherTwo:    *teacher2S2,
 							DoubleTeacher: doubleTeacher,

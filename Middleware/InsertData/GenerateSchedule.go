@@ -6,6 +6,7 @@ import (
 )
 
 func GenerateSchedule(group Models.GroupModel) {
+	//сортировка дней для заполнения
 	var daysForInsert []Models.ScheduleDay
 	days := []Models.ScheduleDay{
 		{Day: 1}, // Понедельник
@@ -33,8 +34,9 @@ func GenerateSchedule(group Models.GroupModel) {
 			daysForInsert2 = append(daysForInsert2, days2[i])
 		}
 	}
-
+	//формирование семестра 1 и 2
 	daysForInsert = InsertInSemester(group.LessonsS1, daysForInsert, group.Name, 1)
+	//название расписания
 	schedule := Models.ScheduleModel{
 		Group: group.Name,
 	}

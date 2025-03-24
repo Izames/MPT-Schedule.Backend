@@ -2,8 +2,8 @@ package GetData
 
 import (
 	"MPT-Schedule/Models"
-	"fmt"
 	"github.com/xuri/excelize/v2"
+	"log"
 	"mime/multipart"
 )
 
@@ -21,12 +21,12 @@ func Deserialization(form *multipart.Form) error {
 	for _, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
-			fmt.Println("Произошла ошибка при парсинге файлов: ", err)
+			log.Println("Произошла ошибка при парсинге файлов: ", err)
 			return err
 		}
 		excelFile, err := excelize.OpenReader(file)
 		if err != nil {
-			fmt.Println("Произошла ошибка при парсинге файлов: ", err)
+			log.Println("Произошла ошибка при парсинге файлов: ", err)
 			return err
 		}
 		Models.Extracts = append(Models.Extracts, excelFile)

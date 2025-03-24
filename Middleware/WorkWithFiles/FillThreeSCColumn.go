@@ -13,12 +13,12 @@ func FillThreeSCColumn(SheetName string, file *excelize.File, schedule []Models.
 	var Weeks [][]Models.ScheduleDay
 	if semester == 1 {
 		Week1 = schedule[0].Semester1.Week
-		Week2 = schedule[0].Semester1.Week
-		Week3 = schedule[0].Semester1.Week
+		Week2 = schedule[1].Semester1.Week
+		Week3 = schedule[2].Semester1.Week
 	} else {
 		Week1 = schedule[0].Semester2.Week
-		Week2 = schedule[0].Semester2.Week
-		Week3 = schedule[0].Semester2.Week
+		Week2 = schedule[1].Semester2.Week
+		Week3 = schedule[2].Semester2.Week
 	}
 	Weeks = append(Weeks, Week1)
 	Weeks = append(Weeks, Week2)

@@ -4,6 +4,7 @@ import (
 	"MPT-Schedule/Models"
 )
 
+// поиск пары для числителя/знаменателя
 func FindDorNLesson(DnNLessons []*Models.LessonModel, lessonNum, weekDay int, build string, startLesson *Models.LessonModel) *Models.LessonModel {
 	for _, lesson := range DnNLessons {
 		if lesson.DoubleTeacher {

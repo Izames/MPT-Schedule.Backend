@@ -4,15 +4,20 @@ import (
 	"MPT-Schedule/Middleware/utils"
 	"MPT-Schedule/Models"
 	"fmt"
+	"math/rand"
 )
 
 func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay, group string, semester int) []Models.ScheduleDay {
+	//сортировка по доступным строениям
 	lessons = utils.SortLessons(lessons)
 	NorDLessons := utils.FindNorDLessons(lessons)
 	attemps := 0
+	//начало алгоритма. Алгоритм перечисляет пары
 	for !(len(lessons) == 0 || attemps > 3) {
 		lessonsCount := len(lessons)
+		//берутся дни для вставления
 		for j := range daysForInsert {
+		LessonLoop:
 			for c := 0; c < len(lessons); c++ {
 				// Проверка на максимальное количество пар в день
 				if len(daysForInsert[j].Lessons) == 5 {
@@ -23,7 +28,8 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 				switch {
 				case daysForInsert[j].Lessons == nil:
 					goBackOnStep := false
-					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 0) {
+					randomLesson := rand.Intn(len(lessons))
+					if utils.InsertDay(&lessons[randomLesson], &daysForInsert[j], NorDLessons, 0, group) {
 						for k, l := range lessons {
 							if l.PerWeek == 0 {
 								lessons = append(lessons[:k], lessons[k+1:]...)
@@ -33,12 +39,13 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 						if goBackOnStep {
 							c--
 						}
-						continue
+						break LessonLoop
 					}
 
 				case len(daysForInsert[j].Lessons) == 1:
 					goBackOnStep := false
-					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 1) {
+					randomLesson := rand.Intn(len(lessons))
+					if utils.InsertDay(&lessons[randomLesson], &daysForInsert[j], NorDLessons, 1, group) {
 						for k, l := range lessons {
 							if l.PerWeek == 0 {
 								lessons = append(lessons[:k], lessons[k+1:]...)
@@ -48,11 +55,12 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 						if goBackOnStep {
 							c--
 						}
-						continue
+						break LessonLoop
 					}
 				case len(daysForInsert[j].Lessons) == 2:
 					goBackOnStep := false
-					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 2) {
+					randomLesson := rand.Intn(len(lessons))
+					if utils.InsertDay(&lessons[randomLesson], &daysForInsert[j], NorDLessons, 2, group) {
 						for k, l := range lessons {
 							if l.PerWeek == 0 {
 								lessons = append(lessons[:k], lessons[k+1:]...)
@@ -62,11 +70,12 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 						if goBackOnStep {
 							c--
 						}
-						continue
+						break LessonLoop
 					}
 				case len(daysForInsert[j].Lessons) == 3:
 					goBackOnStep := false
-					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 3) {
+					randomLesson := rand.Intn(len(lessons))
+					if utils.InsertDay(&lessons[randomLesson], &daysForInsert[j], NorDLessons, 3, group) {
 						for k, l := range lessons {
 							if l.PerWeek == 0 {
 								lessons = append(lessons[:k], lessons[k+1:]...)
@@ -76,11 +85,12 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 						if goBackOnStep {
 							c--
 						}
-						continue
+						break LessonLoop
 					}
 				case len(daysForInsert[j].Lessons) == 4:
 					goBackOnStep := false
-					if utils.InsertDay(&lessons[c], &daysForInsert[j], NorDLessons, 4) {
+					randomLesson := rand.Intn(len(lessons))
+					if utils.InsertDay(&lessons[randomLesson], &daysForInsert[j], NorDLessons, 4, group) {
 						for k, l := range lessons {
 							if l.PerWeek == 0 {
 								lessons = append(lessons[:k], lessons[k+1:]...)
@@ -90,7 +100,7 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 						if goBackOnStep {
 							c--
 						}
-						continue
+						break LessonLoop
 					}
 				case len(daysForInsert[j].Lessons) == 5:
 					continue
