@@ -29,8 +29,6 @@ var EndDate string
 
 var DeputyDirectorUR string
 
-var DeputyDirectorUMR string
-
 var MethodologicalDepartment string
 
 var Extracts []*excelize.File
@@ -48,7 +46,6 @@ func Clean(files []string) {
 	ValidityTerm = ""
 	EndDate = ""
 	DeputyDirectorUR = ""
-	DeputyDirectorUMR = ""
 	MethodologicalDepartment = ""
 	for _, file := range Extracts {
 		file.Close()
