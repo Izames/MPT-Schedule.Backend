@@ -42,7 +42,7 @@ func ZippingFiles(files []*excelize.File) string {
 
 }
 func createZip(sourceDir string) string {
-	zipFileName := fmt.Sprintf("schedules.zip", time.Now().Unix())
+	zipFileName := fmt.Sprintf("schedules_%d.zip", time.Now().Unix())
 	zipFilePath := filepath.Join(os.TempDir(), zipFileName)
 
 	zipFile, err := os.Create(zipFilePath)

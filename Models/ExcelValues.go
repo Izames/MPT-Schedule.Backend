@@ -47,10 +47,6 @@ func Clean(files []string) {
 	EndDate = ""
 	DeputyDirectorUR = ""
 	MethodologicalDepartment = ""
-	for _, file := range Extracts {
-		file.Close()
-		os.Remove(file.Path)
-	}
 	Extracts = nil
 	TeachersS1 = []TeacherModel{}
 	TeachersS2 = []TeacherModel{}

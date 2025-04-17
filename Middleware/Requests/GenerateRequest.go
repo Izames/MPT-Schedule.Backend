@@ -13,7 +13,7 @@ func GenerateRequest(context *gin.Context) {
 	//парсинг данных в мультипарт режиме
 	if err := context.Request.ParseMultipartForm(32 << 22); err != nil {
 		context.JSON(400, gin.H{"error": err.Error()})
-		log.Println("не удалось распарсить данные для генерации расписания")
+		log.Println("не удалось распарсить данные для генерации расписания мультипарт формы")
 		return
 	}
 	//парсинг запроса в переменную
@@ -48,5 +48,5 @@ func GenerateRequest(context *gin.Context) {
 	files, paths := WorkWithFiles.GenerateScheduleFile()
 	zip := WorkWithFiles.ZippingFiles(files)
 	context.File(zip)
-	defer Models.Clean(paths)
+	Models.Clean(paths)
 }
