@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-func GetGroups() {
+func GetGroups(rData *Models.RequestData) {
 	var unSCDays []string
 	var week []Models.Day
-	sheet := Models.Group.GetSheetList()[0]
-	cols, _ := Models.Group.GetCols(sheet)
+	sheet := rData.Group.GetSheetList()[0]
+	cols, _ := rData.Group.GetCols(sheet)
 	for i, col := range cols[10] {
 		if i < 2 {
 			continue
@@ -20,19 +20,19 @@ func GetGroups() {
 			unSCDays = append(unSCDays, strings.ToLower(col))
 		}
 	}
-	rows, _ := Models.Group.GetRows(sheet)
+	rows, _ := rData.Group.GetRows(sheet)
 	for i, row := range rows {
 		var stop = false
 		if i < 1 {
 			continue
 		}
 		if len(row) < 8 {
-			Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Ошибка заполнения группы %s", row[1]))
+			rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Ошибка заполнения группы %s", row[1]))
 			continue
 		}
 		for j := 0; j < 8; j++ {
 			if row[j] == "" {
-				Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Ошибка заполнения группы %s", row[1]))
+				rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Ошибка заполнения группы %s", row[1]))
 				stop = true
 				break
 			}
@@ -47,7 +47,7 @@ func GetGroups() {
 			Name: row[1],
 			Week: week,
 		}
-		Models.Groups = append(Models.Groups, group)
+		rData.Groups = append(rData.Groups, group)
 
 	}
 	println("")

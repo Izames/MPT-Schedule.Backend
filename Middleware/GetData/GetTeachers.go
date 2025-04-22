@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-func GetTeachers() {
-	sheets := Models.Teacher.GetSheetList()
+func GetTeachers(rData *Models.RequestData) {
+	sheets := rData.Teacher.GetSheetList()
 
-	line, _ := Models.Teacher.GetRows(sheets[0])
+	line, _ := rData.Teacher.GetRows(sheets[0])
 	var buildingsName []string
 	for i := 1; i < len(line[0]); i++ {
 		if i < 14 {
@@ -19,25 +19,25 @@ func GetTeachers() {
 		}
 		buildingsName = append(buildingsName, strings.ToLower(line[0][i]))
 	}
-	if len(Models.Builds) == 0 {
-		Models.Builds = buildingsName
+	if len(rData.Builds) == 0 {
+		rData.Builds = buildingsName
 	}
 	buildRows := len(line[0]) - 14
 
 	for _, sheet := range sheets {
-		rows, _ := Models.Teacher.GetRows(sheet)
+		rows, _ := rData.Teacher.GetRows(sheet)
 		for i, row := range rows {
 			var stop = false
 			if i == 0 {
 				continue
 			}
 			if len(row) != len(rows[0]) {
-				Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неправильно заполнены ограничения преподавателя %s в листе %s", row[0], sheet))
+				rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неправильно заполнены ограничения преподавателя %s в листе %s", row[0], sheet))
 				continue
 			}
 			for _, str := range row {
 				if str == "" {
-					Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неправильно заполнены ограничения преподавателя %s в листе %s", row[0], sheet))
+					rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неправильно заполнены ограничения преподавателя %s в листе %s", row[0], sheet))
 					break
 				}
 			}
@@ -45,7 +45,7 @@ func GetTeachers() {
 				continue
 			}
 			if row[13] != "1" && row[13] != "2" && row[13] != "3" && row[13] != "4" && row[13] != "5" {
-				Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неправильно заполнено ограничение пар преподавателя %s в листе %s. Количество должно быть от 1 до 5", row[0], sheet))
+				rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неправильно заполнено ограничение пар преподавателя %s в листе %s. Количество должно быть от 1 до 5", row[0], sheet))
 				continue
 			}
 			lessons, _ := strconv.Atoi(row[13])
@@ -93,14 +93,14 @@ func GetTeachers() {
 			}
 
 			// Добавляем преподавателя в TeachersS1 и TeachersS2
-			Models.TeachersS1 = append(Models.TeachersS1, Models.TeacherModel{
+			rData.TeachersS1 = append(rData.TeachersS1, Models.TeacherModel{
 				FIO:          row[0],
 				Week:         week1,
 				Window:       row[12] == "+",
 				LessonsInDay: lessons,
 				Builds:       buildsForTeacher,
 			})
-			Models.TeachersS2 = append(Models.TeachersS2, Models.TeacherModel{
+			rData.TeachersS2 = append(rData.TeachersS2, Models.TeacherModel{
 				FIO:          row[0],
 				Week:         week2,
 				Window:       row[12] == "+",

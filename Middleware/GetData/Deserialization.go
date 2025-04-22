@@ -7,14 +7,14 @@ import (
 	"mime/multipart"
 )
 
-func Deserialization(form *multipart.Form) error {
-	Models.Director = form.Value["director"][0]
-	Models.Years = form.Value["years"][0]
-	Models.ValidityTerm = form.Value["validity_term"][0]
-	Models.EndDate = form.Value["end_date"][0]
-	Models.DeputyDirectorUR = form.Value["deputy_director_ur"][0]
-	Models.MethodologicalDepartment = form.Value["methodological_department"][0]
-	Models.CurrentYear = form.Value["current_year"][0]
+func Deserialization(form *multipart.Form, rData *Models.RequestData) error {
+	rData.Director = form.Value["director"][0]
+	rData.Years = form.Value["years"][0]
+	rData.ValidityTerm = form.Value["validity_term"][0]
+	rData.EndDate = form.Value["end_date"][0]
+	rData.DeputyDirectorUR = form.Value["deputy_director_ur"][0]
+	rData.MethodologicalDepartment = form.Value["methodological_department"][0]
+	rData.CurrentYear = form.Value["current_year"][0]
 
 	files := form.File["extracts"]
 	for _, fileHeader := range files {
@@ -28,7 +28,7 @@ func Deserialization(form *multipart.Form) error {
 			log.Println("Произошла ошибка при парсинге файлов: ", err)
 			return err
 		}
-		Models.Extracts = append(Models.Extracts, excelFile)
+		rData.Extracts = append(rData.Extracts, excelFile)
 		file.Close()
 		excelFile.Close()
 	}
@@ -38,24 +38,24 @@ func Deserialization(form *multipart.Form) error {
 	if err != nil {
 		return err
 	}
-	Models.Teacher, err = excelize.OpenReader(TeacherFile)
+	rData.Teacher, err = excelize.OpenReader(TeacherFile)
 	if err != nil {
 		return err
 	}
 	TeacherFile.Close()
-	Models.Teacher.Close()
+	rData.Teacher.Close()
 
 	GroupHeader := form.File["group"][0]
 	GroupFile, err := GroupHeader.Open()
 	if err != nil {
 		return err
 	}
-	Models.Group, err = excelize.OpenReader(GroupFile)
+	rData.Group, err = excelize.OpenReader(GroupFile)
 	if err != nil {
 		return err
 	}
 	GroupFile.Close()
-	Models.Group.Close()
+	rData.Group.Close()
 
 	return nil
 }

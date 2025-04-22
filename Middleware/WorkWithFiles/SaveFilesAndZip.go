@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func ZippingFiles(files []*excelize.File) string {
+func ZippingFiles(files []*excelize.File, rData *Models.RequestData) string {
 	//сжатие в зип
 	tempDir, err := os.MkdirTemp("", "temp")
 	if err != nil {
@@ -37,7 +37,7 @@ func ZippingFiles(files []*excelize.File) string {
 	file, _ := os.Create(filePath)
 	defer file.Close()
 	defer os.Remove(filePath)
-	file.WriteString(strings.Join(Models.FilesErrors, "\n"))
+	file.WriteString(strings.Join(rData.FilesErrors, "\n"))
 	return createZip(tempDir)
 
 }

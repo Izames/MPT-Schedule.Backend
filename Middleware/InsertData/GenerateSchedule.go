@@ -5,7 +5,7 @@ import (
 	"MPT-Schedule/Models"
 )
 
-func GenerateSchedule(group Models.GroupModel) {
+func GenerateSchedule(group Models.GroupModel, rData *Models.RequestData) {
 	//сортировка дней для заполнения
 	var daysForInsert []Models.ScheduleDay
 	days := []Models.ScheduleDay{
@@ -35,7 +35,7 @@ func GenerateSchedule(group Models.GroupModel) {
 		}
 	}
 	//формирование семестра 1 и 2
-	daysForInsert = InsertInSemester(group.LessonsS1, daysForInsert, group.Name, 1)
+	daysForInsert = InsertInSemester(group.LessonsS1, daysForInsert, group.Name, 1, rData)
 	//название расписания
 	schedule := Models.ScheduleModel{
 		Group: group.Name,
@@ -53,7 +53,7 @@ func GenerateSchedule(group Models.GroupModel) {
 		schedule.Semester1.Week = append(schedule.Semester1.Week, day)
 	}
 
-	daysForInsert2 = InsertInSemester(group.LessonsS2, daysForInsert2, group.Name, 2)
+	daysForInsert2 = InsertInSemester(group.LessonsS2, daysForInsert2, group.Name, 2, rData)
 	for i, day := range days2 {
 		for _, dayI := range daysForInsert2 {
 			if dayI.Day == day.Day {
@@ -65,5 +65,5 @@ func GenerateSchedule(group Models.GroupModel) {
 		schedule.Semester2.Week = append(schedule.Semester2.Week, day)
 	}
 
-	Models.Schedules = append(Models.Schedules, schedule)
+	rData.Schedules = append(rData.Schedules, schedule)
 }

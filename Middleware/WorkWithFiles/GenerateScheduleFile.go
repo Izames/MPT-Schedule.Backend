@@ -5,13 +5,13 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func GenerateScheduleFile() ([]*excelize.File, []string) {
+func GenerateScheduleFile(rData *Models.RequestData) ([]*excelize.File, []string) {
 	var schedules [][][]Models.ScheduleModel
 	schedulesGroupName := ""
 	schedulesGroupFile := ""
 	id := -1
 	fileId := -1
-	for _, sc := range Models.Schedules {
+	for _, sc := range rData.Schedules {
 		if schedulesGroupFile != sc.File {
 			fileId++
 			schedulesGroupFile = sc.File
@@ -34,7 +34,7 @@ func GenerateScheduleFile() ([]*excelize.File, []string) {
 	var files []*excelize.File
 	var filesPath []string
 	for _, sc := range schedules {
-		file1, file2, path1, path2 := CreateSCFile(sc)
+		file1, file2, path1, path2 := CreateSCFile(sc, rData)
 		files = append(files, file1)
 		files = append(files, file2)
 		filesPath = append(filesPath, path1)

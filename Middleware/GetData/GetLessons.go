@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func GetLessons(file *excelize.File, fileName string) {
+func GetLessons(file *excelize.File, fileName string, rData *Models.RequestData) {
 	//листы для считывания информации
 	sheets := file.GetSheetList()
 	re := regexp.MustCompile(`^ПП`)
@@ -23,7 +23,7 @@ func GetLessons(file *excelize.File, fileName string) {
 
 		//сокращенный массив групп состоящий из их названий
 		var groupsForCheck []string
-		for _, group := range Models.Groups {
+		for _, group := range rData.Groups {
 			groupsForCheck = append(groupsForCheck, group.Name)
 		}
 
@@ -89,24 +89,24 @@ func GetLessons(file *excelize.File, fileName string) {
 					if re.MatchString(row[i]) {
 						doubleTeacher = true
 						match1, match2, _ := strings.Cut(row[i], "\n")
-						teacher1S1 = utils.FindTeacherByName(match1, 1)
-						teacher2S1 = utils.FindTeacherByName(match2, 1)
-						teacher1S2 = utils.FindTeacherByName(match1, 2)
-						teacher2S2 = utils.FindTeacherByName(match2, 2)
+						teacher1S1 = utils.FindTeacherByName(match1, 1, rData)
+						teacher2S1 = utils.FindTeacherByName(match2, 1, rData)
+						teacher1S2 = utils.FindTeacherByName(match1, 2, rData)
+						teacher2S2 = utils.FindTeacherByName(match2, 2, rData)
 						if teacher1S1 == nil || teacher2S2 == nil {
 							stop = true
-							Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Один из преподавателей английского не найден в системе %s на листе %s", row[i], sheet))
+							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Один из преподавателей английского не найден в системе %s на листе %s", row[i], sheet))
 							break
 						}
 
 					} else {
 						doubleTeacher = false
 						match1 := row[i]
-						teacher1S1 = utils.FindTeacherByName(match1, 1)
-						teacher1S2 = utils.FindTeacherByName(match1, 2)
+						teacher1S1 = utils.FindTeacherByName(match1, 1, rData)
+						teacher1S2 = utils.FindTeacherByName(match1, 2, rData)
 						if teacher1S1 == nil {
 							stop = true
-							Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неопознанный преподаватель %s на листе %s", row[i], sheet))
+							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неопознанный преподаватель %s на листе %s", row[i], sheet))
 							break
 						}
 					}
@@ -121,9 +121,9 @@ func GetLessons(file *excelize.File, fileName string) {
 							TeacherTwo:    *teacher2S1,
 							DoubleTeacher: doubleTeacher,
 						}
-						Models.Groups[groupsId[i-prepodsStart]].LessonsS1 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS1, lessonS1)
-						Models.Groups[groupsId[i-prepodsStart]].ListName = sheet
-						Models.Groups[groupsId[i-prepodsStart]].FileName = fileName
+						rData.Groups[groupsId[i-prepodsStart]].LessonsS1 = append(rData.Groups[groupsId[i-prepodsStart]].LessonsS1, lessonS1)
+						rData.Groups[groupsId[i-prepodsStart]].ListName = sheet
+						rData.Groups[groupsId[i-prepodsStart]].FileName = fileName
 					}
 
 					if Value2S > 0 {
@@ -134,9 +134,9 @@ func GetLessons(file *excelize.File, fileName string) {
 							TeacherTwo:    *teacher2S2,
 							DoubleTeacher: doubleTeacher,
 						}
-						Models.Groups[groupsId[i-prepodsStart]].LessonsS2 = append(Models.Groups[groupsId[i-prepodsStart]].LessonsS2, lessonS2)
-						Models.Groups[groupsId[i-prepodsStart]].ListName = sheet
-						Models.Groups[groupsId[i-prepodsStart]].FileName = fileName
+						rData.Groups[groupsId[i-prepodsStart]].LessonsS2 = append(rData.Groups[groupsId[i-prepodsStart]].LessonsS2, lessonS2)
+						rData.Groups[groupsId[i-prepodsStart]].ListName = sheet
+						rData.Groups[groupsId[i-prepodsStart]].FileName = fileName
 
 					}
 				}
@@ -148,12 +148,12 @@ func GetLessons(file *excelize.File, fileName string) {
 				check := false
 				for i := 0; i < len(row); i++ {
 					if check {
-						groupId := utils.FindGroupByName(row[i])
+						groupId := utils.FindGroupByName(row[i], rData)
 						if groupId != -1 {
 							groupsId = append(groupsId, groupId)
 							switchToLessons = true
 						} else {
-							Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("Неопознанная группа %s на листе %s", row[i], sheet))
+							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неопознанная группа %s на листе %s", row[i], sheet))
 							stop = true
 						}
 					}

@@ -7,9 +7,9 @@ import (
 	"math/rand"
 )
 
-func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay, group string, semester int) []Models.ScheduleDay {
+func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay, group string, semester int, rData *Models.RequestData) []Models.ScheduleDay {
 	//сортировка по доступным строениям
-	lessons = utils.SortLessons(lessons)
+	lessons = utils.SortLessons(lessons, rData)
 	NorDLessons := utils.FindNorDLessons(lessons)
 	attemps := 0
 	//начало алгоритма. Алгоритм перечисляет пары
@@ -112,7 +112,7 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 			attemps++
 			if attemps == 3 {
 				for l := range lessons {
-					Models.FilesErrors = append(Models.FilesErrors, fmt.Sprintf("ошибка при генерации расписания, у %s не были вставлены пары: %s в %d семестре. Пар осталось: %f", group, lessons[l].Name, semester, lessons[l].PerWeek))
+					rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("ошибка при генерации расписания, у %s не были вставлены пары: %s в %d семестре. Пар осталось: %f", group, lessons[l].Name, semester, lessons[l].PerWeek))
 				}
 			}
 		}

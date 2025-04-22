@@ -6,7 +6,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func FillOneSCColumn(SheetName string, file *excelize.File, schedule []Models.ScheduleModel, semester int) *excelize.File {
+func FillOneSCColumn(SheetName string, file *excelize.File, schedule []Models.ScheduleModel, semester int, rData *Models.RequestData) *excelize.File {
 	var Week1 []Models.ScheduleDay
 	var Weeks [][]Models.ScheduleDay
 	if semester == 1 {
@@ -158,21 +158,21 @@ func FillOneSCColumn(SheetName string, file *excelize.File, schedule []Models.Sc
 	file.SetCellStyle(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 1), fmt.Sprintf("%s%d", Models.Columns[8], 96), whiteStyle)
 	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 1), "УТВЕРЖДАЮ")
 	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 2), "Директор Московского приборостроительного техникума")
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 3), fmt.Sprintf("____________________________ %s", Models.Director))
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 4), fmt.Sprintf("\"________\" _______________________%s.г", Models.CurrentYear))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 3), fmt.Sprintf("____________________________ %s", rData.Director))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 4), fmt.Sprintf("\"________\" _______________________%s.г", rData.CurrentYear))
 	file.MergeCell(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 6), fmt.Sprintf("%s%d", Models.Columns[8], 6))
 	file.SetCellStyle(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 6), fmt.Sprintf("%s%d", Models.Columns[8], 6), boldStyle)
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 6), fmt.Sprintf("Расписание учебных занятий на %d семестр %s учебного года", semester, Models.Years))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 6), fmt.Sprintf("Расписание учебных занятий на %d семестр %s учебного года", semester, rData.Years))
 	file.MergeCell(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 7), fmt.Sprintf("%s%d", Models.Columns[8], 7))
 	file.SetCellStyle(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 7), fmt.Sprintf("%s%d", Models.Columns[8], 7), boldStyle)
 	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 7), fmt.Sprintf("групп %s", groups))
 	file.SetCellStyle(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 8), fmt.Sprintf("%s%d", Models.Columns[8], 8), centerTextStyle)
 	file.MergeCell(SheetName, fmt.Sprintf("%s%d", Models.Columns[0], 8), fmt.Sprintf("%s%d", Models.Columns[8], 8))
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 8), fmt.Sprintf("действует с %s по %s", Models.ValidityTerm, Models.EndDate))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[6], 8), fmt.Sprintf("действует с %s по %s", rData.ValidityTerm, rData.EndDate))
 	//создание footer
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[1], 95), fmt.Sprintf("Заместитель директора по УР                                           %s", Models.DeputyDirectorUR))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[1], 95), fmt.Sprintf("Заместитель директора по УР                                           %s", rData.DeputyDirectorUR))
 	file.SetCellStyle(SheetName, fmt.Sprintf("%s%d", Models.Columns[5], 95), fmt.Sprintf("%s%d", Models.Columns[5], 95), centerTextStyle)
-	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[5], 95), fmt.Sprintf("Начальник учебно-методического отдела                     %s", Models.MethodologicalDepartment))
+	file.SetCellValue(SheetName, fmt.Sprintf("%s%d", Models.Columns[5], 95), fmt.Sprintf("Начальник учебно-методического отдела                     %s", rData.MethodologicalDepartment))
 	file.MergeCell(SheetName, fmt.Sprintf("%s%d", Models.Columns[5], 95), fmt.Sprintf("%s%d", Models.Columns[8], 95))
 	//создание шаблона
 

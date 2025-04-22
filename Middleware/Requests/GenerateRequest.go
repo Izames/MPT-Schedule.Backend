@@ -10,6 +10,7 @@ import (
 )
 
 func GenerateRequest(context *gin.Context) {
+	requestData := Models.RequestData{}
 	//парсинг данных в мультипарт режиме
 	if err := context.Request.ParseMultipartForm(32 << 22); err != nil {
 		context.JSON(400, gin.H{"error": err.Error()})
@@ -31,22 +32,25 @@ func GenerateRequest(context *gin.Context) {
 		return
 	}
 	//Десериализация данных
-	if err = GetData.Deserialization(form); err != nil {
+	if err = GetData.Deserialization(form, &requestData); err != nil {
 		context.JSON(400, gin.H{"error": err.Error()})
 		log.Println("не удалось распарсить данные для генерации расписания")
 		return
 	}
 	//собрать ограничения учителей
-	GetData.GetTeachers()
-	GetData.GetGroups()
-	for i, file := range Models.Extracts {
-		GetData.GetLessons(file, extractFiles[i].Filename)
+	GetData.GetTeachers(&requestData)
+	GetData.GetGroups(&requestData)
+	for i, file := range requestData.Extracts {
+		GetData.GetLessons(file, extractFiles[i].Filename, &requestData)
 	}
-	for _, group := range Models.Groups {
-		InsertData.GenerateSchedule(group)
+	for _, group := range requestData.Groups {
+		InsertData.GenerateSchedule(group, &requestData)
 	}
-	files, paths := WorkWithFiles.GenerateScheduleFile()
-	zip := WorkWithFiles.ZippingFiles(files)
+	files, _ := WorkWithFiles.GenerateScheduleFile(&requestData)
+	zip := WorkWithFiles.ZippingFiles(files, &requestData)
+
+	// Устанавливаем заголовки для правильного определения файла
+	context.Header("Content-Type", "application/zip")
+
 	context.File(zip)
-	Models.Clean(paths)
 }

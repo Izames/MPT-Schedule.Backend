@@ -6,7 +6,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize.File, string, string) {
+func CreateSCFile(schedules [][]Models.ScheduleModel, rData *Models.RequestData) (*excelize.File, *excelize.File, string, string) {
 	newFile1S := excelize.NewFile()
 	newFile2S := excelize.NewFile()
 	filePath1 := ""
@@ -18,16 +18,16 @@ func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize
 			newFile1S.DeleteSheet("Sheet1")
 			newFile2S.DeleteSheet("Sheet1")
 			if len(schedule) == 3 {
-				FillThreeSCColumn(schedule[0].List, newFile1S, schedule, 1)
-				FillThreeSCColumn(schedule[0].List, newFile2S, schedule, 2)
+				FillThreeSCColumn(schedule[0].List, newFile1S, schedule, 1, rData)
+				FillThreeSCColumn(schedule[0].List, newFile2S, schedule, 2, rData)
 			}
 			if len(schedule) == 2 {
-				FillTwoSCColumn(schedule[0].List, newFile1S, schedule, 1)
-				FillTwoSCColumn(schedule[0].List, newFile2S, schedule, 2)
+				FillTwoSCColumn(schedule[0].List, newFile1S, schedule, 1, rData)
+				FillTwoSCColumn(schedule[0].List, newFile2S, schedule, 2, rData)
 			}
 			if len(schedule) == 1 {
-				FillOneSCColumn(schedule[0].List, newFile1S, schedule, 1)
-				FillOneSCColumn(schedule[0].List, newFile2S, schedule, 2)
+				FillOneSCColumn(schedule[0].List, newFile1S, schedule, 1, rData)
+				FillOneSCColumn(schedule[0].List, newFile2S, schedule, 2, rData)
 			}
 		} else {
 			// Определяем, как делить элементы
@@ -40,8 +40,8 @@ func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize
 					}
 					newFile1S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
 					newFile2S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
-					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, sc, 1)
-					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, sc, 2)
+					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, sc, 1, rData)
+					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, sc, 2, rData)
 				}
 			case 1, 2:
 				if len(schedule)%2 == 0 {
@@ -52,8 +52,8 @@ func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize
 						}
 						newFile1S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
 						newFile2S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
-						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, sc, 1)
-						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, sc, 2)
+						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, sc, 1, rData)
+						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, sc, 2, rData)
 					}
 				} else {
 					var sc []Models.ScheduleModel
@@ -62,8 +62,8 @@ func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize
 					}
 					newFile1S.NewSheet(fmt.Sprintf("%s.%d", schedule[0].List, 1))
 					newFile2S.NewSheet(fmt.Sprintf("%s.%d", schedule[0].List, 1))
-					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile1S, sc, 1)
-					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile2S, sc, 2)
+					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile1S, sc, 1, rData)
+					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile2S, sc, 2, rData)
 					for i := 2; i < len(schedule); i += 2 {
 						var scs []Models.ScheduleModel
 						for j := 0; j < 2; j++ {
@@ -71,8 +71,8 @@ func CreateSCFile(schedules [][]Models.ScheduleModel) (*excelize.File, *excelize
 						}
 						newFile1S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
 						newFile2S.NewSheet(fmt.Sprintf("%s.%d", schedule[i].List, i))
-						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, scs, 1)
-						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, scs, 2)
+						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile1S, scs, 1, rData)
+						FillTwoSCColumn(fmt.Sprintf("%s.%d", schedule[i].List, i), newFile2S, scs, 2, rData)
 					}
 				}
 			}
