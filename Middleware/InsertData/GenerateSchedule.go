@@ -7,7 +7,10 @@ import (
 
 func GenerateSchedule(group Models.GroupModel, rData *Models.RequestData) {
 	//сортировка дней для заполнения
-	var daysForInsert []Models.ScheduleDay
+	daysForInsert := make([]Models.ScheduleDay, 0)
+	for daySlot := range daysForInsert {
+		daysForInsert[daySlot].Lessons = make([]Models.ScheduleLesson, 5)
+	}
 	days := []Models.ScheduleDay{
 		{Day: 1}, // Понедельник
 		{Day: 2}, // Вторник
@@ -16,7 +19,7 @@ func GenerateSchedule(group Models.GroupModel, rData *Models.RequestData) {
 		{Day: 5}, // Пятница
 		{Day: 6}, // Суббота
 	}
-	var daysForInsert2 []Models.ScheduleDay
+	daysForInsert2 := make([]Models.ScheduleDay, 0)
 	days2 := []Models.ScheduleDay{
 		{Day: 1}, // Понедельник
 		{Day: 2}, // Вторник
@@ -28,7 +31,7 @@ func GenerateSchedule(group Models.GroupModel, rData *Models.RequestData) {
 	for i := range days {
 		var result bool
 		days[i], result = utils.FilterUnSKDays(group, days[i])
-		days2[i], result = utils.FilterUnSKDays(group, days[i])
+		days2[i], result = utils.FilterUnSKDays(group, days2[i])
 		if result {
 			daysForInsert = append(daysForInsert, days[i])
 			daysForInsert2 = append(daysForInsert2, days2[i])

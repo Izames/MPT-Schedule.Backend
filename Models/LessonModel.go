@@ -7,3 +7,12 @@ type LessonModel struct {
 	TeacherTwo    TeacherModel
 	DoubleTeacher bool
 }
+
+type LessonModelND struct {
+	OneND         bool
+	NumLesson     LessonModel
+	DenLesson     LessonModel
+	TryInserted   bool
+	SlotInserted  int
+	OneFarAlready bool
+}

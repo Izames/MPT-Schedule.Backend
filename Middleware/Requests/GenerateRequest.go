@@ -7,6 +7,7 @@ import (
 	"MPT-Schedule/Models"
 	"github.com/gin-gonic/gin"
 	"log"
+	"os"
 )
 
 func GenerateRequest(context *gin.Context) {
@@ -46,8 +47,12 @@ func GenerateRequest(context *gin.Context) {
 	for _, group := range requestData.Groups {
 		InsertData.GenerateSchedule(group, &requestData)
 	}
-	files, _ := WorkWithFiles.GenerateScheduleFile(&requestData)
+	files, fileNames := WorkWithFiles.GenerateScheduleFile(&requestData)
 	zip := WorkWithFiles.ZippingFiles(files, &requestData)
+
+	for _, file := range fileNames {
+		os.Remove(file)
+	}
 
 	// Устанавливаем заголовки для правильного определения файла
 	context.Header("Content-Type", "application/zip")

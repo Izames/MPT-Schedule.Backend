@@ -9,7 +9,6 @@ import (
 
 func GetGroups(rData *Models.RequestData) {
 	var unSCDays []string
-	var week []Models.Day
 	sheet := rData.Group.GetSheetList()[0]
 	cols, _ := rData.Group.GetCols(sheet)
 	for i, col := range cols[10] {
@@ -22,6 +21,7 @@ func GetGroups(rData *Models.RequestData) {
 	}
 	rows, _ := rData.Group.GetRows(sheet)
 	for i, row := range rows {
+		var week []Models.Day
 		var stop = false
 		if i < 1 {
 			continue
