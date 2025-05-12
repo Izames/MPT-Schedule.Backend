@@ -34,5 +34,5 @@ func Routes() {
 	privateRoutes.Use(JWT.JWTAuth())
 	privateRoutes.POST("/generateSchedule", Requests.GenerateRequest)
 
-	router.Run(":8090")
+	router.Run(":8091")
 }

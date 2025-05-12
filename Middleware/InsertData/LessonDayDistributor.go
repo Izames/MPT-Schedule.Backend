@@ -6,13 +6,14 @@ import (
 )
 
 // LessonDayDistributor класс, который берет массив пар подготовленных для дня недели и распределяет. К примеру с 1 по 4, или со 2 по 5
-func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.ScheduleDay, group string, semester, day int, rData *Models.RequestData, BrokenTry bool) bool {
+func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.ScheduleDay, group string, semester, day int, rData *Models.RequestData, BrokenTry bool) (bool, []Models.LessonModelND) {
 	PairCount := len(lessons)
 	if len(lessons) == 0 {
 		if BrokenTry {
 			rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Ошибка! у группы %s %d семестра в %d день недели нету пар", group, semester, day+1))
+			rData.Failure = true
 		}
-		return false
+		return false, nil
 	}
 	pairLessons := make([][]*Models.LessonModelND, 5)
 	LessonSlotDistributor(lessons, pairLessons, dayForInsert)
@@ -31,13 +32,15 @@ func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.Sc
 	if FailAttempt {
 		if BrokenTry {
 			rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("ошибка! не удалось найти верной комбинации пар для группы %s %d семестра %d-го дня недели", group, semester, day+1))
+			rData.Failure = true
 		}
-		return false
+		return false, nil
 	} else {
 		TeacherMarking(pairLessons, day)
 	}
 	println("dfdf")
-	return true
+
+	return true, lessons
 }
 
 func Iterate(pairLessons [][]*Models.LessonModelND, i, PairCount int, group string) bool {

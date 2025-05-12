@@ -38,4 +38,6 @@ type RequestData struct {
 	Group *excelize.File
 
 	FilesErrors []string
+
+	Failure bool
 }
