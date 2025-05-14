@@ -11,6 +11,7 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 	BrokenTry := false
 	var LessonsWeek [][]Models.LessonModelND
 	for {
+		var allPairLessons [][][]*Models.LessonModelND
 		LessonsWeek = make([][]Models.LessonModelND, 0)
 		if attempts >= 9 {
 			BrokenTry = true
@@ -83,16 +84,25 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 		}
 		result := true
 		for i := range LessonsWeek {
-			result, LessonsWeek[i] = LessonDayDistributor(LessonsWeek[i], daysForInsert[i], group, semester, daysForInsert[i].Day-1, rData, BrokenTry)
-			if !result {
+			var pairLessons [][]*Models.LessonModelND
+			result, LessonsWeek[i], pairLessons = LessonDayDistributor(LessonsWeek[i], daysForInsert[i], group, semester, daysForInsert[i].Day-1, rData, BrokenTry)
+			if !result && !BrokenTry {
 				break
+			} else {
+				allPairLessons = append(allPairLessons, pairLessons)
 			}
 		}
 		if result {
+			for i := range allPairLessons {
+				utils.TeacherMarking(allPairLessons[i], daysForInsert[i].Day-1)
+			}
 			break
 		}
 		attempts++
 		if BrokenTry {
+			for i := range allPairLessons {
+				utils.TeacherMarking(allPairLessons[i], daysForInsert[i].Day-1)
+			}
 			break
 		}
 	}

@@ -6,14 +6,14 @@ import (
 )
 
 // LessonDayDistributor класс, который берет массив пар подготовленных для дня недели и распределяет. К примеру с 1 по 4, или со 2 по 5
-func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.ScheduleDay, group string, semester, day int, rData *Models.RequestData, BrokenTry bool) (bool, []Models.LessonModelND) {
+func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.ScheduleDay, group string, semester, day int, rData *Models.RequestData, BrokenTry bool) (bool, []Models.LessonModelND, [][]*Models.LessonModelND) {
 	PairCount := len(lessons)
 	if len(lessons) == 0 {
 		if BrokenTry {
 			rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Ошибка! у группы %s %d семестра в %d день недели нету пар", group, semester, day+1))
 			rData.Failure = true
 		}
-		return false, nil
+		return false, nil, nil
 	}
 	pairLessons := make([][]*Models.LessonModelND, 5)
 	LessonSlotDistributor(lessons, pairLessons, dayForInsert)
@@ -34,12 +34,10 @@ func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.Sc
 			rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("ошибка! не удалось найти верной комбинации пар для группы %s %d семестра %d-го дня недели", group, semester, day+1))
 			rData.Failure = true
 		}
-		return false, nil
-	} else {
-		TeacherMarking(pairLessons, day)
+		return false, nil, nil
 	}
 
-	return true, lessons
+	return true, lessons, pairLessons
 }
 
 func Iterate(pairLessons [][]*Models.LessonModelND, i, PairCount int, group string) bool {
@@ -63,37 +61,4 @@ func Iterate(pairLessons [][]*Models.LessonModelND, i, PairCount int, group stri
 		}
 	}
 	return result
-}
-func TeacherMarking(pairLessons [][]*Models.LessonModelND, day int) {
-	for i := range pairLessons {
-		for _, lesson := range pairLessons[i] {
-			if lesson.OneND {
-				if lesson.NumLesson.DoubleTeacher && lesson.SlotInserted != 0 {
-					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.NumLesson.TeacherTwo.Week[day].Lessons[lesson.SlotInserted-1] = false
-				} else if lesson.SlotInserted != 0 {
-					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-				}
-			} else {
-				if lesson.SlotInserted != 0 {
-					if lesson.NumLesson.Name != "" && lesson.DenLesson.Name != "" {
-						TeacherMark(&lesson.NumLesson, lesson.NumLesson.DoubleTeacher, day, lesson.SlotInserted-1)
-						TeacherMark(&lesson.DenLesson, lesson.DenLesson.DoubleTeacher, day, lesson.SlotInserted-1)
-					} else if lesson.NumLesson.Name != "" {
-						TeacherMark(&lesson.NumLesson, lesson.NumLesson.DoubleTeacher, day, lesson.SlotInserted-1)
-					} else {
-						TeacherMark(&lesson.DenLesson, lesson.DenLesson.DoubleTeacher, day, lesson.SlotInserted-1)
-					}
-				}
-			}
-		}
-	}
-}
-func TeacherMark(lesson *Models.LessonModel, doubleTeacher bool, day, lessonNum int) {
-	if doubleTeacher {
-		lesson.Teacher.Week[day].Lessons[lessonNum] = false
-		lesson.TeacherTwo.Week[day].Lessons[lessonNum] = false
-	} else {
-		lesson.Teacher.Week[day].Lessons[lessonNum] = false
-	}
 }
