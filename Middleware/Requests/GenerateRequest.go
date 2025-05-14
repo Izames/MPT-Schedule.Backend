@@ -26,7 +26,7 @@ func GenerateRequest(context *gin.Context) {
 		log.Println("не удалось распарсить данные для генерации расписания")
 		return
 	}
-
+	var allAttempts []Models.RequestData
 	attempts := 0
 	for {
 		requestData := Models.RequestData{}
@@ -54,7 +54,30 @@ func GenerateRequest(context *gin.Context) {
 			}
 			InsertData.GenerateSchedule(group, &requestData)
 		}
-
+		if utils.TeacherWindowCheck(requestData.TeachersS1) || utils.TeacherWindowCheck(requestData.TeachersS2) {
+			requestData.Failure = true
+		}
+		if requestData.Failure {
+			attempts++
+			allAttempts = append(allAttempts, requestData)
+			if attempts < 9 {
+				continue
+			} else {
+				errors := -1
+				var finalRData Models.RequestData
+				for i := range allAttempts {
+					if errors == -1 {
+						allAttempts[i] = allAttempts[len(allAttempts)-1]
+						finalRData = allAttempts[i]
+					}
+					if len(allAttempts[i].FilesErrors) < errors {
+						errors = len(allAttempts[i].FilesErrors)
+						finalRData = allAttempts[i]
+					}
+				}
+				requestData = finalRData
+			}
+		}
 		folder, _ := os.MkdirTemp("", "Расписание групп_*")
 		for i := range requestData.Schedules {
 			InsertData.GroupSchedules(requestData.Schedules[i], folder)
@@ -66,15 +89,6 @@ func GenerateRequest(context *gin.Context) {
 			os.Remove(file)
 		}
 
-		if utils.TeacherWindowCheck(requestData.TeachersS1) || utils.TeacherWindowCheck(requestData.TeachersS2) {
-			requestData.Failure = true
-		}
-		if requestData.Failure {
-			attempts++
-			if attempts < 9 {
-				continue
-			}
-		}
 		// Устанавливаем заголовки для правильного определения файла
 		context.Header("Content-Type", "application/zip")
 		context.File(zip)
