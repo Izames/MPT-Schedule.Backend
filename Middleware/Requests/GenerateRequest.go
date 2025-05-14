@@ -49,6 +49,9 @@ func GenerateRequest(context *gin.Context) {
 			GetData.GetLessons(file, extractFiles[i].Filename, &requestData)
 		}
 		for _, group := range requestData.Groups {
+			if group.FileName == "" {
+				continue
+			}
 			InsertData.GenerateSchedule(group, &requestData)
 		}
 

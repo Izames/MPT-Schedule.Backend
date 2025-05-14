@@ -5,6 +5,9 @@ import (
 )
 
 func CheckLesson(lesson *Models.LessonModel, weekDay int, build string, rData *Models.RequestData, LessonsDay []Models.LessonModelND) (bool, bool) {
+	if lesson.Name == "" {
+		return true, false
+	}
 	reservedLessons, FarRange, OnlyEndFree := TeacherLessonsReserved(lesson.Teacher.Week[weekDay])
 	if len(LessonsDay) >= 5 {
 		return false, FarRange

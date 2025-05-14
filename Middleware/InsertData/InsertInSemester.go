@@ -19,7 +19,7 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 		for range daysForInsert {
 			LessonsWeek = append(LessonsWeek, []Models.LessonModelND{})
 		}
-		Lessons := utils.RandomLessonSplitter(lessons, daysForInsert)
+		Lessons := utils.RandomLessonSplitter(lessons, daysForInsert, rData)
 		//создаем дубликат недели чтобы просто скидать туда пары в кучу и потом распределить
 		j := 0
 		maxCycles := len(LessonsWeek) + 1
@@ -96,7 +96,6 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 			break
 		}
 	}
-	println("df")
 	for i := range LessonsWeek {
 		daysForInsert[i].Lessons = make([]Models.ScheduleLesson, 5)
 		for c := range LessonsWeek[i] {

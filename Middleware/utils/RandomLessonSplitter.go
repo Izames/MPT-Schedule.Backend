@@ -9,7 +9,7 @@ import (
 
 // RandomLessonSplitter отделяет пары друг от друга: составляет симбиоз и половинчатых пар,
 // а также делает из (пара X 2 раза в неделю -> Пара X 1 раз в неделю, Пара X 1 раз в неделю)
-func RandomLessonSplitter(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay) []Models.LessonModelND {
+func RandomLessonSplitter(lessons []Models.LessonModel, daysForInsert []Models.ScheduleDay, rData *Models.RequestData) []Models.LessonModelND {
 	var newLessons []Models.LessonModelND
 	var NorDLessons []Models.LessonModel
 	var NDLessons []Models.LessonModel
@@ -47,7 +47,13 @@ func RandomLessonSplitter(lessons []Models.LessonModel, daysForInsert []Models.S
 
 	//добавляем половинчатые пары, где одна соединена с другой
 	for i := 0; i < len(NorDLessons); i += 2 {
-		newLessons = append(newLessons, Models.LessonModelND{DenLesson: NorDLessons[i], NumLesson: NorDLessons[i+1], OneND: false})
+		if i+1 == len(NorDLessons) {
+			var per float32
+			per = 0
+			newLessons = append(newLessons, Models.LessonModelND{DenLesson: NorDLessons[i], NumLesson: Models.LessonModel{Name: "", PerWeek: per}, OneND: false})
+		} else {
+			newLessons = append(newLessons, Models.LessonModelND{DenLesson: NorDLessons[i], NumLesson: NorDLessons[i+1], OneND: false})
+		}
 	}
 
 	//перемешать их всех

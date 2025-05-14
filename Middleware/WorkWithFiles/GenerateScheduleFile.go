@@ -13,6 +13,7 @@ func GenerateScheduleFile(rData *Models.RequestData) ([]*excelize.File, []string
 	fileId := -1
 	for _, sc := range rData.Schedules {
 		if schedulesGroupFile != sc.File {
+			id = -1
 			fileId++
 			schedulesGroupFile = sc.File
 			if schedulesGroupName != sc.List {

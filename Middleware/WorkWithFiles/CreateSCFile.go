@@ -64,7 +64,7 @@ func CreateSCFile(schedules [][]Models.ScheduleModel, rData *Models.RequestData)
 					newFile2S.NewSheet(fmt.Sprintf("%s.%d", schedule[0].List, 1))
 					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile1S, sc, 1, rData)
 					FillThreeSCColumn(fmt.Sprintf("%s.%d", schedule[0].List, 1), newFile2S, sc, 2, rData)
-					for i := 2; i < len(schedule); i += 2 {
+					for i := 3; i < len(schedule); i += 2 {
 						var scs []Models.ScheduleModel
 						for j := 0; j < 2; j++ {
 							scs = append(scs, schedule[j+i])

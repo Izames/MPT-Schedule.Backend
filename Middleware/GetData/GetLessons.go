@@ -94,9 +94,8 @@ func GetLessons(file *excelize.File, fileName string, rData *Models.RequestData)
 						teacher1S2 = utils.FindTeacherByName(match1, 2, rData)
 						teacher2S2 = utils.FindTeacherByName(match2, 2, rData)
 						if teacher1S1 == nil || teacher2S2 == nil {
-							stop = true
 							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Один из преподавателей английского не найден в системе %s на листе %s", row[i], sheet))
-							break
+							continue
 						}
 
 					} else {
@@ -105,9 +104,8 @@ func GetLessons(file *excelize.File, fileName string, rData *Models.RequestData)
 						teacher1S1 = utils.FindTeacherByName(match1, 1, rData)
 						teacher1S2 = utils.FindTeacherByName(match1, 2, rData)
 						if teacher1S1 == nil {
-							stop = true
 							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неопознанный преподаватель %s на листе %s", row[i], sheet))
-							break
+							continue
 						}
 					}
 
@@ -153,7 +151,7 @@ func GetLessons(file *excelize.File, fileName string, rData *Models.RequestData)
 							groupsId = append(groupsId, groupId)
 							switchToLessons = true
 						} else {
-							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неопознанная группа %s на листе %s", row[i], sheet))
+							rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("Неопознанная группа %s на листе %s файла %s", row[i], sheet, fileName))
 							stop = true
 						}
 					}

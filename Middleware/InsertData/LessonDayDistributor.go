@@ -38,15 +38,12 @@ func LessonDayDistributor(lessons []Models.LessonModelND, dayForInsert Models.Sc
 	} else {
 		TeacherMarking(pairLessons, day)
 	}
-	println("dfdf")
 
 	return true, lessons
 }
 
 func Iterate(pairLessons [][]*Models.LessonModelND, i, PairCount int, group string) bool {
 	result := false
-	log := fmt.Sprintf("количество пар: %d i: %d группа: %s", PairCount, i, group)
-	println(log)
 	for j := range pairLessons[i] {
 		if !pairLessons[i][j].TryInserted {
 			pairLessons[i][j].TryInserted = true
@@ -78,23 +75,25 @@ func TeacherMarking(pairLessons [][]*Models.LessonModelND, day int) {
 					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
 				}
 			} else {
-				if lesson.NumLesson.DoubleTeacher && !lesson.DenLesson.DoubleTeacher && lesson.SlotInserted != 0 {
-					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.NumLesson.TeacherTwo.Week[day].Lessons[lesson.SlotInserted-1] = false
-				} else if !lesson.NumLesson.DoubleTeacher && lesson.DenLesson.DoubleTeacher && lesson.SlotInserted != 0 {
-					lesson.DenLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.DenLesson.TeacherTwo.Week[day].Lessons[lesson.SlotInserted-1] = false
-				} else if lesson.NumLesson.DoubleTeacher && lesson.DenLesson.DoubleTeacher && lesson.SlotInserted != 0 {
-					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.NumLesson.TeacherTwo.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.DenLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.DenLesson.TeacherTwo.Week[day].Lessons[lesson.SlotInserted-1] = false
-				} else if !lesson.NumLesson.DoubleTeacher && !lesson.DenLesson.DoubleTeacher && lesson.SlotInserted != 0 {
-					lesson.NumLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
-					lesson.DenLesson.Teacher.Week[day].Lessons[lesson.SlotInserted-1] = false
+				if lesson.SlotInserted != 0 {
+					if lesson.NumLesson.Name != "" && lesson.DenLesson.Name != "" {
+						TeacherMark(&lesson.NumLesson, lesson.NumLesson.DoubleTeacher, day, lesson.SlotInserted-1)
+						TeacherMark(&lesson.DenLesson, lesson.DenLesson.DoubleTeacher, day, lesson.SlotInserted-1)
+					} else if lesson.NumLesson.Name != "" {
+						TeacherMark(&lesson.NumLesson, lesson.NumLesson.DoubleTeacher, day, lesson.SlotInserted-1)
+					} else {
+						TeacherMark(&lesson.DenLesson, lesson.DenLesson.DoubleTeacher, day, lesson.SlotInserted-1)
+					}
 				}
 			}
 		}
 	}
-	println("sd")
+}
+func TeacherMark(lesson *Models.LessonModel, doubleTeacher bool, day, lessonNum int) {
+	if doubleTeacher {
+		lesson.Teacher.Week[day].Lessons[lessonNum] = false
+		lesson.TeacherTwo.Week[day].Lessons[lessonNum] = false
+	} else {
+		lesson.Teacher.Week[day].Lessons[lessonNum] = false
+	}
 }
