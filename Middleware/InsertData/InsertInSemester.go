@@ -11,26 +11,44 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 	BrokenTry := false
 	var LessonsWeek [][]Models.LessonModelND
 	for {
+		WeekPairLessons := make([][][]*Models.LessonModelND, len(daysForInsert))
+		for i := range WeekPairLessons {
+			WeekPairLessons[i] = make([][]*Models.LessonModelND, 5)
+		}
 		var allPairLessons [][][]*Models.LessonModelND
 		LessonsWeek = make([][]Models.LessonModelND, 0)
 		if attempts >= 9 {
 			BrokenTry = true
 		}
-		var BrokenLessons []Models.LessonModelND
 		for range daysForInsert {
 			LessonsWeek = append(LessonsWeek, []Models.LessonModelND{})
 		}
 		Lessons := utils.RandomLessonSplitter(lessons, daysForInsert, rData)
 		//создаем дубликат недели чтобы просто скидать туда пары в кучу и потом распределить
+		for i := range daysForInsert {
+			LessonSlotDistributor(Lessons, WeekPairLessons[i], daysForInsert[i])
+		}
 		j := 0
-		maxCycles := len(LessonsWeek) + 1
+		maxCycles := len(LessonsWeek)
 		currentCycles := 0
+		LessonsLen := -1
+		LessonsAttempts := 0
 		for len(Lessons) > 0 {
 
 			if currentCycles > maxCycles {
-				BrokenLessons = append(BrokenLessons, Lessons[0])
+
+				Lessons = append(Lessons, Lessons[0])
 				Lessons = Lessons[1:]
 				currentCycles = 0
+				if len(Lessons) == LessonsLen {
+					LessonsAttempts++
+				} else {
+					LessonsLen = len(Lessons)
+					LessonsAttempts = 0
+				}
+				if LessonsAttempts > 5 {
+					break
+				}
 				continue
 			}
 
@@ -43,7 +61,6 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 					if FarRange {
 						Lessons[0].OneFarAlready = true
 					}
-					currentCycles = 0
 				} else {
 					currentCycles++
 					j++
@@ -56,24 +73,48 @@ func InsertInSemester(lessons []Models.LessonModel, daysForInsert []Models.Sched
 					if FarRange1 || FarRange2 {
 						Lessons[0].OneFarAlready = true
 					}
-					currentCycles = 0
 				} else {
 					currentCycles++
 					j++
 					continue
 				}
-
 			}
-			LessonsWeek[j] = append(LessonsWeek[j], Lessons[0])
-			Lessons = Lessons[1:]
-			j++
+			Able := false
+			if len(LessonsWeek[j]) >= 1 {
+				TempLessons := make([][]*Models.LessonModelND, 5)
+				TempLessonsWeek := append(LessonsWeek[j], Lessons[0])
+				LessonSlotDistributor(TempLessonsWeek, TempLessons, daysForInsert[j])
+				Count := 0
+				for i := range TempLessons {
+					if len(TempLessons[i]) >= 1 {
+						Count++
+					} else {
+						Count = 0
+					}
+					if Count >= len(TempLessonsWeek) {
+						Able = true
+					}
+				}
+			} else {
+				Able = true
+			}
+			if Able {
+				currentCycles = 0
+				LessonsAttempts = 0
+				LessonsWeek[j] = append(LessonsWeek[j], Lessons[0])
+				Lessons = Lessons[1:]
+				j++
+			} else {
+				currentCycles++
+				j++
+			}
 
 		}
-		if len(BrokenLessons) > 0 && !BrokenTry {
+		if len(Lessons) > 0 && !BrokenTry {
 			attempts++
 			continue
 		}
-		for _, lesson := range BrokenLessons {
+		for _, lesson := range Lessons {
 			if lesson.OneND {
 				rData.FilesErrors = append(rData.FilesErrors, fmt.Sprintf("В группу %s %d семестра не была вставлена пара %s", group, semester, lesson.NumLesson.Name))
 				rData.Failure = true

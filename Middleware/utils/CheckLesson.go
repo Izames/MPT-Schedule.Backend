@@ -149,7 +149,7 @@ func CheckLesson(lesson *Models.LessonModel, weekDay int, build string, rData *M
 	if repeats > 1 {
 		return false, FarRange
 	}
-	if (repeats == 1 && reservedLessons == 4) || (repeats == 1 && FarRange) {
+	if (repeats == 1 && reservedLessons == 4) || ((repeats == 1 && FarRange) && len(LessonsDay) < 4) {
 		return false, FarRange
 	}
 	if len(LessonsDay) > 0 {

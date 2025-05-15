@@ -3,8 +3,6 @@ package utils
 import (
 	"MPT-Schedule/Models"
 	"math"
-	"math/rand"
-	"time"
 )
 
 // RandomLessonSplitter отделяет пары друг от друга: составляет симбиоз и половинчатых пар,
@@ -57,11 +55,11 @@ func RandomLessonSplitter(lessons []Models.LessonModel, daysForInsert []Models.S
 	}
 
 	//перемешать их всех
-	for range 10 {
-		rand.Seed(time.Now().UnixNano()) // Инициализация генератора случайных чисел
-		rand.Shuffle(len(newLessons), func(i, j int) {
-			newLessons[i], newLessons[j] = newLessons[j], newLessons[i]
-		})
-	}
+	//for range 10 {
+	//	rand.Seed(time.Now().UnixNano()) // Инициализация генератора случайных чисел
+	//	rand.Shuffle(len(newLessons), func(i, j int) {
+	//		newLessons[i], newLessons[j] = newLessons[j], newLessons[i]
+	//	})
+	//}
 	return SortPriority(daysForInsert, newLessons)
 }
